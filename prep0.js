@@ -1,3 +1,4 @@
+//script to write the file name
 var fs = require('fs')
 var data = JSON.parse(fs.readFileSync('0-area/srtm30m_bounding_boxes.json', 'utf8'))
 
