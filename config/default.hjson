@@ -1,4 +1,7 @@
 {
     srcDir: src
     gdalmergePath: gdal_merge.py
+    rasterioPath: rasterio 
+    maxZ: 11 
+    minZ: 9
 }
