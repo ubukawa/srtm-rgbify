@@ -1,11 +1,9 @@
+//test of gdal_merge.py from node js
 const config = require('config')
 const {spawn} = require('child_process')
 
 const srcDir = config.get('srcDir')
 const gdalmergePath = config.get('gdalmergePath')
-
-
-
 
 let gdalmergeArray = [
     '-o', 'test-merged.tif' 

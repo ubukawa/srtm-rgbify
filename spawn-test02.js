@@ -1,3 +1,4 @@
+//test of gdal_merge.py and rasterio rgbify from node js
 const config = require('config')
 const {spawn} = require('child_process')
 
@@ -23,7 +24,7 @@ gdalmerge.on('exit', () => {
     const RGBconversion = new Promise((resolve, reject)=>{
         const rasterio = spawn(rasterioPath,[
             'rgbify', '-b', '-10000', '-i', '0.1',
-            '-max-z', maxZ, '--min-z', minZ, '--format', 'webp',
+            '--max-z', maxZ, '--min-z', minZ, '--format', 'webp',
             'test-merged.tif', 'out000.mbtiles'
         ])
         .on('exit', ()=>{
