@@ -1,7 +1,6 @@
 //script to
 const fs = require('fs')
 const tilebelt = require('@mapbox/tilebelt')
-const { clear } = require('console')
 var data = JSON.parse(fs.readFileSync('0-area/srtm30m_bounding_boxes.json', 'utf8'))
 var srcFiles = []
 var modules
