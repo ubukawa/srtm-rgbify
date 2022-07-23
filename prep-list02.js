@@ -2,12 +2,12 @@ const fs = require('fs')
 const config = require('config')
 
 const srcDir = config.get('srcDir')
-const srtmFiles = config.get('srtmFiles')
+const srtmFiles = config.get('srtmFiles') //list from the EarthExplorer
 
-var fileList = fs.readdirSync(srcDir)
+var fileList = fs.readdirSync(srcDir) //list from the src folder
 fileList = fileList.filter(r => r.indexOf('.tif') !== -1)
 
-let srtmFiles2 = []
+let srtmFiles2 = [] //list from the src folder
 for (let i=0; i<srtmFiles.length; i++){
     //srtmfile = srtmfile.replace('SRTM','ww')
     //srtmFiles[i] = srtmFiles[i].replace('SRTM','ww')
