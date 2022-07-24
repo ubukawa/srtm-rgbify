@@ -16,6 +16,7 @@ The directory where SRTM data is saved
 * prep
     * prep0.js: reading file name from geojson (srtm data extent)
     * prep4.js: list the srtm files for certain module (e.g. z-x-y)
+    * prep5.js: module list is treated as object because it could contain the list of srtm files
 
 
 * spawn
