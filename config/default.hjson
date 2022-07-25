@@ -3,7 +3,7 @@
     gdalmergePath: gdal_merge.py
     rasterioPath: rasterio 
     maxZ: 11 
-    minZ: 6
+    minZ: 9
     concurrent: 3
     maxRetries: 3
     retryDelay: 5000

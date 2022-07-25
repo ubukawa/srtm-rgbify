@@ -1,4 +1,4 @@
-// index00.js --> until merge
+// index01..js --> until rgb
 //modules
 const config = require('config')
 const fs = require('fs')
@@ -129,29 +129,36 @@ const queue = new Queue(async (t, cb) => {
     let gdalmergeArray = [
         '-o', mergedPath
     ]
+    const mgStartTime = new Date()
 
     gdalmergeArray = gdalmergeArray.concat(modulesObj[key])
     //console.log(gdalmergeArray)
 
     const gdalmerge = spawn(gdalmergePath, gdalmergeArray)
-    gdalmerge.on('exit', ()=> {
-        console.log(`merge ends: ${key}`)
-        keyInProgress = keyInProgress.filter((v) => !(v === key)) 
-        return cb()
-    })
+    .on('exit', ()=> {
+        const mgEndTime = new Date() 
+        console.log(`--- ${key}: merge ends (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} )`)
+        const RGBconversion = new Promise((resolve, reject)=>{
+            const rasterio = spawn(rasterioPath, [
+                'rgbify', '-b', '-10000', '-i', '0.1', '--max-z', maxZ, '--min-z', minZ, '--format', 'webp',
+                //'--bounding-tile', x, y, z
+                //mergedPath, tmpPath
+                'merge/6-32-32.tif', 'mbtiles/test.mbtiles'
+            ])
+            rasterio.on('exit',()=>{
+                fs.renameSync(tmpPath, dstPath)
+                fs.unlinkSync(mergedPath)
+                resolve()
+            })
+        })
+        .then(()=>{            
+            let TiEndTime = new Date()
+            console.log(`--- ${key}: tippecanoe ends (${mgEndTime.toISOString()} --> ${TiEndTime.toISOString()}): ${key}`)
+            keyInProgress = keyInProgress.filter((v) => !(v === key)) 
+            return cb()
+        })
+     })
 
-/*
-    const sample = new Promise((resolve, reject)=>{
-        setTimeout(()=>{
-            resolve()
-            }, 500)
-    })
-
-    sample.then(() => {
-        keyInProgress = keyInProgress.filter((v) => !(v === key))  
-        return cb()
-    })
-*/
     },{
     concurrent: config.get('concurrent'),
     maxRetries: config.get('maxRetries'),
