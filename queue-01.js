@@ -3,7 +3,6 @@ const config = require('config')
 const fs = require('fs')
 const tilebelt = require('@mapbox/tilebelt')
 const Queue = require('better-queue')
-const { resolve } = require('path')
 
 //config parameters
 const srcDir = config.get('srcDir')
