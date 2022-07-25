@@ -78,7 +78,8 @@ for (const key of keys){
             if(srtmFiles.includes(nm)){
                 console.log (`${nm}---> yes(${key})`)
                 modules[key].push(nm)
-                modulesObj[key].push(nm)
+                modulesObj[key].push(`${srcDir}/${nm}`)
+                //modulesObj[key].push(nm)
             }    
             //} else {
             //    console.log (`${n}${m}`)
@@ -86,7 +87,6 @@ for (const key of keys){
             //console.log(`${n}${m}`)
         }
     }
-    //console.log(module[key])
     if (modules[key].length == 0){
         //modules[key] = null
         //delete module[key]
@@ -102,8 +102,7 @@ for (const key of keys){
 //modules = modules.filter(v => !emptyModules.includes(v))
 
 //console.log(modulesObj)
-console.log(Object.keys(modulesObj)) //object to array
+console.log(modulesObj['6-34-32'])
+//console.log(Object.keys(modulesObj)) //object to array
 console.log(Object.keys(modulesObj).length)
-//console.log(emptyEodules)
-//console.log(srtmFiles)
 
