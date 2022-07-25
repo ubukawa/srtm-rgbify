@@ -1,43 +1,38 @@
-//script to
+//modules
 const config = require('config')
 const fs = require('fs')
 const tilebelt = require('@mapbox/tilebelt')
 
+//config parameters
 const srcDir = config.get('srcDir')
 
-var fileList = fs.readdirSync(srcDir) //list from the src folder
-fileList = fileList.filter(r => r.indexOf('.tif') !== -1)
+let modulesObj = {} //object {key: [srcFile, ... ], ...}
+let emptyModules = []
+let keys = [] //Array of key such as "6-x-y"
 
-let srtmFiles = [] //list from the src folder
+let fileList = fs.readdirSync(srcDir) //list from the src folder
+fileList = fileList.filter(r => r.indexOf('.tif') !== -1) //only tiff file
+
+let srtmFiles = [] //list from the src folder. file name: nXX_eXXX_1arc_V3.tif
 for (let i=0; i<fileList.length; i++){
     srtmFiles.push(fileList[i].replace('SRTM1','').replace('W','_w').replace('E','_e').replace('V3','_1arc_v3.tif').toLowerCase())
 }
 
-var modules = []
-var modulesObj = {}
-var emptyModules = []
-
-let keys = []
+//keys
 for (x = 0; x < 64; x ++){
     for (y = 0; y < 64; y++) {
         let key = `6-${x}-${y}`
         keys.push(key)
     }
 }
-//console.log(keys)
 
 for (const key of keys){
 //for (const key of ['6-31-31','6-32-32']){
-//const key = '6-33-31'
-    var [tilez, tilex, tiley] = key.split('-')
+    let [tilez, tilex, tiley] = key.split('-')
     tilex = Number(tilex)
     tiley = Number(tiley)
     tilez = Number(tilez)
     const bbox = tilebelt.tileToBBOX([tilex, tiley, tilez])
-    //var bbox = [-1.5, 1.5, 3.2, 5] //[xmin, ymin, xmax, ymax]
-    //console.log(bbox)
-    //console.log(key)
-    modules[key] = []
     modulesObj[key] = []
 
     for (x=Math.floor(bbox[0]); x < bbox[2]; x++ ){
@@ -76,20 +71,12 @@ for (const key of keys){
             }
             nm = `${n.toLowerCase()}_${m.toLowerCase()}_1arc_v3.tif`
             if(srtmFiles.includes(nm)){
-                console.log (`${nm}---> yes(${key})`)
-                modules[key].push(nm)
+                //console.log (`${nm}---> yes(${key})`)
                 modulesObj[key].push(`${srcDir}/${nm}`)
-                //modulesObj[key].push(nm)
             }    
-            //} else {
-            //    console.log (`${n}${m}`)
-            //}
-            //console.log(`${n}${m}`)
         }
     }
-    if (modules[key].length == 0){
-        //modules[key] = null
-        //delete module[key]
+    if (Object.keys(modulesObj[key]).length == 0) {
         emptyModules.push(key)
     } 
     if (modulesObj[key].length == 0){
@@ -98,11 +85,10 @@ for (const key of keys){
 
 }
 
-
-//modules = modules.filter(v => !emptyModules.includes(v))
-
 //console.log(modulesObj)
-console.log(modulesObj['6-34-32'])
-//console.log(Object.keys(modulesObj)) //object to array
-console.log(Object.keys(modulesObj).length)
+//console.log(Object.keys(modulesObj)) // Array of modules
+//console.log(Object.keys(modulesObj).length) // length of the modules
+//console.log(emptyModules.length)
 
+console.log(`-------UNVT---------------\nProduction starts: \n- We have ${Object.keys(modulesObj).length} modules with SRTM DEM. \n- ${emptyModules.length} modules are without SRTM DEM.\n-------UNVT---------------`)
+console.log(`Here is the list of ${Object.keys(modulesObj).length} modules: \n${Object.keys(modulesObj)}`) 
