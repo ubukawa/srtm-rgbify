@@ -3,6 +3,8 @@
 const config = require('config')
 const fs = require('fs')
 const {spawn} = require('child_process')
+const {execSync} = require('child_process')
+const {exec} = require('child_process')
 const tilebelt = require('@mapbox/tilebelt')
 const Queue = require('better-queue')
 
@@ -130,10 +132,40 @@ const queue = new Queue(async (t, cb) => {
         '-o', mergedPath
     ]
     const mgStartTime = new Date()
-
     gdalmergeArray = gdalmergeArray.concat(modulesObj[key])
-    //console.log(gdalmergeArray)
+    const gdalmerge = spawn(gdalmergePath, gdalmergeArray)
+    //gdalmerge.stdout.on('data', (data) => {
+    //    console.log(`stdout: ${data}`)
+    //})
+    gdalmerge.stderr.on('data', (data) =>{
+        console.log(`stderr:${data}`)
+    })
+    gdalmerge.on('error', (error) => console.log(error.message.message))
+    gdalmerge.on('exit', (code, signal) =>{
+        if(code) console.log(`process exit with code: ${code}.`)
+        if(signal) console.log(`process killed with signal: ${signal}.`)
+        console.log('done')
+        keyInProgress = keyInProgress.filter((v) => !(v === key)) 
+        return cb()
+    })
 
+
+
+/*
+    let command = `${gdalmergePath} ${gdalmergeArray.toString().replace(/,/g, " ")}`
+    //exec(command, (err, stdout, stderr) => {
+    exec(command, (err, stdout, stderr) => {
+        if(err){
+            console.log(`stderr: ${stderr}`)
+            return
+        }
+        console.log(`stdout: ${stdout}`)
+    })
+
+    console.log('SyncEnd')
+*/
+
+    /*
     const gdalmerge = spawn(gdalmergePath, gdalmergeArray)
     .on('exit', ()=> {
         const mgEndTime = new Date() 
@@ -158,6 +190,8 @@ const queue = new Queue(async (t, cb) => {
             return cb()
         })
      })
+     */
+     
 
     },{
     concurrent: config.get('concurrent'),
