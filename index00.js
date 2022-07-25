@@ -1,6 +1,8 @@
+// index00.js --> until merge
 //modules
 const config = require('config')
 const fs = require('fs')
+const {spawn} = require('child_process')
 const tilebelt = require('@mapbox/tilebelt')
 const Queue = require('better-queue')
 
@@ -8,6 +10,10 @@ const Queue = require('better-queue')
 const srcDir = config.get('srcDir')
 const mergeDir = config.get('mergeDir')
 const mbtilesDir = config.get('mbtilesDir')
+const gdalmergePath = config.get('gdalmergePath')
+const rasterioPath = config.get('rasterioPath')
+const maxZ = config.get('maxZ')
+const minZ = config.get('minZ')
 
 let modulesObj = {} //object {key: [srcFile, ... ], ...}
 let emptyModules = []
@@ -120,7 +126,21 @@ const queue = new Queue(async (t, cb) => {
     console.log(`--- ${key} (${countModule}/${Object.keys(modulesObj).length}): ${modulesObj[key].length} src file/files`) //list of src files
     //console.log(`--- ${key} (${countModule}/${Object.keys(modulesObj).length}): ${modulesObj[key].length}   (${modulesObj[key]})`) //list of src files
 
+    let gdalmergeArray = [
+        '-o', mergedPath
+    ]
 
+    gdalmergeArray = gdalmergeArray.concat(modulesObj[key])
+    //console.log(gdalmergeArray)
+
+    const gdalmerge = spawn(gdalmergePath, gdalmergeArray)
+    gdalmerge.on('exit', ()=> {
+        console.log(`merge ends: ${key}`)
+        keyInProgress = keyInProgress.filter((v) => !(v === key)) 
+        return cb()
+    })
+
+/*
     const sample = new Promise((resolve, reject)=>{
         setTimeout(()=>{
             resolve()
@@ -131,7 +151,7 @@ const queue = new Queue(async (t, cb) => {
         keyInProgress = keyInProgress.filter((v) => !(v === key))  
         return cb()
     })
-
+*/
     },{
     concurrent: config.get('concurrent'),
     maxRetries: config.get('maxRetries'),
