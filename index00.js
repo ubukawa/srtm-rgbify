@@ -6,6 +6,8 @@ const Queue = require('better-queue')
 
 //config parameters
 const srcDir = config.get('srcDir')
+const mergeDir = config.get('mergeDir')
+const mbtilesDir = config.get('mbtilesDir')
 
 let modulesObj = {} //object {key: [srcFile, ... ], ...}
 let emptyModules = []
@@ -107,6 +109,9 @@ const queue = new Queue(async (t, cb) => {
     const key = t.key
     const tile = t.tile
     const [z, x, y] = tile
+    const mergedPath = `${mergeDir}/${key}.tif`
+    const tmpPath = `${mbtilesDir}/part-${key}.mbtiles`
+    const dstPath = `${mbtilesDir}/${key}.mbtiles`
     countModule ++
 
     keyInProgress.push(key)

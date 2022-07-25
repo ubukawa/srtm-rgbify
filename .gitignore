@@ -1,3 +1,5 @@
 node_modules
 src/*.tif
 src/src0
+merge/*.tif
+mbtiles/*.mbtiles
