@@ -109,16 +109,13 @@ for (const key of keys){
 //console.log(emptyModules.length)
 
 
-
-
-
 const queue = new Queue(async (t, cb) => {
     const startTime = new Date()
     const key = t.key
     const tile = t.tile
     const [z, x, y] = tile
     const mergedPath = `${mergeDir}/${key}.tif`
-    const tmpPath = `${mbtilesDir}/part-${key}.mbtiles`
+    //const tmpPath = `${mbtilesDir}/part-${key}.mbtiles`
     const dstPath = `${mbtilesDir}/${key}.mbtiles`
     countModule ++
 
@@ -144,7 +141,15 @@ const queue = new Queue(async (t, cb) => {
     gdalmerge.on('exit', (code, signal) =>{
         if(code) console.log(`process exit with code: ${code}.`)
         if(signal) console.log(`process killed with signal: ${signal}.`)
-        console.log('done')
+        const mgEndTime = new Date() 
+        console.log(`--- ${key}: merge ends (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} )`)
+        let rasterioCommand = `${rasterioPath} rgbify -b -10000 -i 0.1 --max-z ${maxZ} --min-z ${minZ} --format webp ${mergedPath} ${dstPath}`
+        //console.log(rasterioCommand)
+        try{
+            const RGBconversion = execSync(rasterioCommand)
+        } catch (err) {
+            console.log("stdeff",err.stderr.toString())
+        }
         keyInProgress = keyInProgress.filter((v) => !(v === key)) 
         return cb()
     })
