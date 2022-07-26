@@ -151,6 +151,8 @@ const queue = new Queue(async (t, cb) => {
             console.log("stdeff",err.stderr.toString())
         }
         keyInProgress = keyInProgress.filter((v) => !(v === key)) 
+        const rgbEndTime = new Date() 
+        console.log(`--- ${key}: RGBify ends (${mgEndTime.toISOString()} --> ${mrgbEndTime.toISOString()} )`)
         return cb()
     })
 
