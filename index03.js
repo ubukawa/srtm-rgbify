@@ -115,7 +115,7 @@ const queue = new Queue(async (t, cb) => {
     const tile = t.tile
     const [z, x, y] = tile
     const mergedPath = `${mergeDir}/${key}.tif`
-    //const tmpPath = `${mbtilesDir}/part-${key}.mbtiles`
+    const tmpPath = `${mbtilesDir}/part-${key}.mbtiles`
     const dstPath = `${mbtilesDir}/${key}.mbtiles`
     countModule ++
 
@@ -142,8 +142,8 @@ const queue = new Queue(async (t, cb) => {
         if(code) console.log(`process exit with code: ${code}.`)
         if(signal) console.log(`process killed with signal: ${signal}.`)
         const mgEndTime = new Date() 
-        console.log(`--- ${key}: merge ends (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} )`)
-        let rasterioCommand = `${rasterioPath} rgbify -b -10000 -i 0.1 --max-z ${maxZ} --min-z ${minZ} --format webp ${mergedPath} ${dstPath}`
+        //console.log(`--- ${key}: merge ends (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} )`)
+        let rasterioCommand = `${rasterioPath} rgbify -b -10000 -i 0.1 --max-z ${maxZ} --min-z ${minZ} --format webp ${mergedPath} ${tmpPath}`
         //console.log(rasterioCommand)
         try{
             const RGBconversion = execSync(rasterioCommand)
@@ -151,8 +151,10 @@ const queue = new Queue(async (t, cb) => {
             console.log("stdeff",err.stderr.toString())
         }
         keyInProgress = keyInProgress.filter((v) => !(v === key)) 
+        fs.renameSync(tmpPath,dstPath)
+        fs.unlinkSync(mergedPath)
         const rgbEndTime = new Date() 
-        console.log(`--- ${key}: RGBify ends (${mgEndTime.toISOString()} --> ${mrgbEndTime.toISOString()} )`)
+        console.log(`--- ${key} ends: (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} --> ${rgbEndTime.toISOString()} )`)
         return cb()
     })
 
