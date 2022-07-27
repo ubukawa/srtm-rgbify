@@ -157,56 +157,11 @@ const queue = new Queue(async (t, cb) => {
         console.log(`--- ${key} ends: (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} --> ${rgbEndTime.toISOString()} )`)
         return cb()
     })
-
-
-
-/*
-    let command = `${gdalmergePath} ${gdalmergeArray.toString().replace(/,/g, " ")}`
-    //exec(command, (err, stdout, stderr) => {
-    exec(command, (err, stdout, stderr) => {
-        if(err){
-            console.log(`stderr: ${stderr}`)
-            return
-        }
-        console.log(`stdout: ${stdout}`)
-    })
-
-    console.log('SyncEnd')
-*/
-
-    /*
-    const gdalmerge = spawn(gdalmergePath, gdalmergeArray)
-    .on('exit', ()=> {
-        const mgEndTime = new Date() 
-        console.log(`--- ${key}: merge ends (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} )`)
-        const RGBconversion = new Promise((resolve, reject)=>{
-            const rasterio = spawn(rasterioPath, [
-                'rgbify', '-b', '-10000', '-i', '0.1', '--max-z', maxZ, '--min-z', minZ, '--format', 'webp',
-                //'--bounding-tile', x, y, z
-                //mergedPath, tmpPath
-                'merge/6-32-32.tif', 'mbtiles/test.mbtiles'
-            ])
-            rasterio.on('exit',()=>{
-                fs.renameSync(tmpPath, dstPath)
-                fs.unlinkSync(mergedPath)
-                resolve()
-            })
-        })
-        .then(()=>{            
-            let TiEndTime = new Date()
-            console.log(`--- ${key}: tippecanoe ends (${mgEndTime.toISOString()} --> ${TiEndTime.toISOString()}): ${key}`)
-            keyInProgress = keyInProgress.filter((v) => !(v === key)) 
-            return cb()
-        })
-     })
-     */
-     
-
-    },{
+},{
     concurrent: config.get('concurrent'),
     maxRetries: config.get('maxRetries'),
     retryDelay: config.get('retryDelay')
-    })
+})
 
 const queueTasks = () => {
     for (let module of Object.keys(modulesObj)){
