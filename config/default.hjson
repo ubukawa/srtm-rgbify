@@ -1,5 +1,6 @@
 {
     srcDir: src
+    srcTestDir: src-test
     gdalmergePath: gdal_merge.py
     rasterioPath: rasterio 
     maxZ: 12 
