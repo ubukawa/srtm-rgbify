@@ -3,6 +3,7 @@
 const config = require('config')
 const fs = require('fs')
 const {spawn} = require('child_process')
+//const {spawnSync} = require('child_process')
 const {execSync} = require('child_process')
 const {exec} = require('child_process')
 const tilebelt = require('@mapbox/tilebelt')
@@ -26,6 +27,12 @@ let countModule = 0
 
 const isIdle = () => {
     return idle
+}
+
+const sleep = (wait) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(()=> {resolve(), wait})
+    })
 }
 
 let fileList = fs.readdirSync(srcDir) //list from the src folder
@@ -122,7 +129,7 @@ const queue = new Queue(async (t, cb) => {
     keyInProgress.push(key)
     console.log(`[${keyInProgress}] in progress`)
 
-    console.log(`--- ${key} (${countModule}/${Object.keys(modulesObj).length}): ${modulesObj[key].length} src file/files`) //list of src files
+    console.log(`--- ${key} (${countModule}/${Object.keys(modulesObj).length}) starts: ${modulesObj[key].length} src file/files`) //list of src files
     //console.log(`--- ${key} (${countModule}/${Object.keys(modulesObj).length}): ${modulesObj[key].length}   (${modulesObj[key]})`) //list of src files
 
     let gdalmergeArray = [
@@ -130,12 +137,15 @@ const queue = new Queue(async (t, cb) => {
     ]
     const mgStartTime = new Date()
     gdalmergeArray = gdalmergeArray.concat(modulesObj[key])
+    //console.log(gdalmergeArray)
+
     const gdalmerge = spawn(gdalmergePath, gdalmergeArray)
+    //const gdalmerge = spawnSync(gdalmergePath, gdalmergeArray)
     //gdalmerge.stdout.on('data', (data) => {
     //    console.log(`stdout: ${data}`)
     //})
     gdalmerge.stderr.on('data', (data) =>{
-        console.log(`stderr:${data}`)
+        console.log(`stderr(at merge):${data}`)
     })
     gdalmerge.on('error', (error) => console.log(error.message.message))
     gdalmerge.on('exit', (code, signal) =>{
@@ -143,18 +153,18 @@ const queue = new Queue(async (t, cb) => {
         if(signal) console.log(`process killed with signal: ${signal}.`)
         const mgEndTime = new Date() 
         //console.log(`--- ${key}: merge ends (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} )`)
-        let rasterioCommand = `${rasterioPath} rgbify -b -10000 -i 0.1 --max-z ${maxZ} --min-z ${minZ} --format webp ${mergedPath} ${tmpPath}`
-        //console.log(rasterioCommand)
+        let rasterioCommand = `${rasterioPath} rgbify -b -10000 -i 0.1 --max-z ${maxZ} --min-z ${minZ} --format webp --bounding-tile [${x.toString()},${y.toString()},${z.toString()}] ${mergedPath} ${tmpPath}` //no space between bounding tiles, x, y, z. 
+        console.log(rasterioCommand)
         try{
             const RGBconversion = execSync(rasterioCommand)
         } catch (err) {
-            console.log("stdeff",err.stderr.toString())
+            console.log("stderr",err.stderr.toString())
         }
         keyInProgress = keyInProgress.filter((v) => !(v === key)) 
-        fs.renameSync(tmpPath,dstPath)
-        fs.unlinkSync(mergedPath)
+        //fs.renameSync(tmpPath,dstPath)
+        //fs.unlinkSync(mergedPath)
         const rgbEndTime = new Date() 
-        console.log(`--- ${key} ends: (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} --> ${rgbEndTime.toISOString()} )`)
+        console.log(`--- ${key} ends: ${modulesObj[key].length} files (${mgStartTime.toISOString()} --> ${mgEndTime.toISOString()} --> ${rgbEndTime.toISOString()} )`)
         return cb()
     })
 },{
