@@ -7,7 +7,7 @@ const Queue = require('better-queue')
 
 //config parameters
 const srcDir = config.get('srcDir')
-const mergeDir = config.get('mergeDir')
+const mergeDir = config.get('mergeDir7')
 const mbtilesDir = config.get('mbtilesDir')
 const gdalmergePath = config.get('gdalmergePath')
 
@@ -36,10 +36,10 @@ for (let i=0; i<fileList.length; i++){
     srtmFiles.push(fileList[i].replace('SRTM1','').replace('W','_w').replace('E','_e').replace('V3','_1arc_v3.tif').toLowerCase())
 }
 
-//keys (6-x-y)
-for (x = 0; x < 64; x ++){
-    for (y = 0; y < 64; y++) {
-        let key = `6-${x}-${y}`
+//keys (7-x-y)
+for (x = 0; x < 128; x ++){
+    for (y = 0; y < 128; y++) {
+        let key = `7-${x}-${y}`
         keys.push(key)
     }
 }
@@ -152,7 +152,8 @@ const queue = new Queue(async (t, cb) => {
     })
     }
 },{
-    concurrent: config.get('concurrent'),
+    //concurrent: config.get('concurrent'),
+    concurrent: 5,
     maxRetries: config.get('maxRetries'),
     retryDelay: config.get('retryDelay')
 })

@@ -3,4 +3,6 @@ src/*.tif
 src/src0
 src-test/*.tif
 merge/*.tif
+src-test/*.tif
+merge7/*.tif
 mbtiles/*.mbtiles

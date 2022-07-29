@@ -5,10 +5,11 @@
     rasterioPath: rasterio 
     maxZ: 12 
     minZ: 6
-    concurrent: 3
+    concurrent: 2
     maxRetries: 3
     retryDelay: 5000
     mergeDir: merge
+    mergeDir7: merge7
     mbtilesDir: mbtiles
     srtmFiles:[
         SRTM1N00E006V3
