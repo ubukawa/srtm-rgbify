@@ -5,7 +5,7 @@
     rasterioPath: rasterio 
     maxZ: 12 
     minZ: 6
-    concurrent: 2
+    concurrent: 3
     maxRetries: 3
     retryDelay: 5000
     mergeDir: merge
