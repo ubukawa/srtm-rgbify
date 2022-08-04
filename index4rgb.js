@@ -51,7 +51,8 @@ const queue = new Queue(async (t, cb) => {
     const rgbStartTime = new Date()
     const rgbify = spawn(rasterioPath, [
         'rgbify', '-b','-10000','-i','0.1', '--max-z', maxZ, '--min-z', minZ,
-        '--format', 'webp', 'bounding-tile', `[${x.toString()},${y.toString()},${z.toString()}]`, mergedPath, tmpPath
+        '--format', 'webp', '--bounding-tile', `[${x.toString()},${y.toString()},${z.toString()}]`, 
+        mergedPath, tmpPath
     ])
     //rgbify.stdout.on('data', (data) => {
     //    console.log(`stdout: ${data}`)
@@ -80,7 +81,7 @@ const queueTasks = () => {
     for (let key of keys){
     //for (let tile of [[6,32,20],[6,32,21],[6,32,22],[6,32,23],[6,33,20],[6,33,21],[6,33,22]]){
     //for (let key of ['bndl1', 'bndl2', 'bndl3', 'bndl4', 'bndl5', 'bndl6']){
-        let tile = module.split('-').map(v => Number(v))
+        let tile = key.split('-').map(v => Number(v))
         queue.push({
             key: key,
             tile: tile
