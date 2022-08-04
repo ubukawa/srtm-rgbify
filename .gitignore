@@ -6,3 +6,4 @@ merge/*.tif
 src-test/*.tif
 merge7/*.tif
 mbtiles/*.mbtiles
+mbtiles/*
