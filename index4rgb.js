@@ -49,28 +49,36 @@ const queue = new Queue(async (t, cb) => {
     console.log(`--- ${key} (${countModule}/${keys.length}) starts`) //list of src files
 
     const rgbStartTime = new Date()
-    const rgbify = spawn(rasterioPath, [
-        'rgbify', '-b','-10000','-i','0.1', '--max-z', maxZ, '--min-z', minZ,
-        '--format', 'webp', '--bounding-tile', `[${x.toString()},${y.toString()},${z.toString()}]`, 
-        mergedPath, tmpPath
-    ])
-    //rgbify.stdout.on('data', (data) => {
-    //    console.log(`stdout: ${data}`)
-    //})
-    rgbify.stderr.on('data', (data) =>{
-        console.log(`stderr(at rgbify):${data}`)
-    })
-    rgbify.on('error', (error) => console.log(error.message.message))
-    rgbify.on('exit', (code, signal) =>{
-        if(code) console.log(`process exit with code: ${code}.`)
-        if(signal) console.log(`process killed with signal: ${signal}.`)
+
+
+    if(fs.existsSync(dstPath)){
+        console.log(`--- ${key}: file already exists (${rgbStartTime.toISOString()})`)
         keyInProgress = keyInProgress.filter((v) => !(v === key)) 
-        fs.renameSync(tmpPath,dstPath)
-        //fs.unlinkSync(mergedPath)
-        const rgbEndTime = new Date() 
-        console.log(`--- ${key} ends:  (${rgbStartTime.toISOString()} --> ${rgbEndTime.toISOString()} )`)
-        return cb()
-    })
+        return cb()        
+    } else {
+        const rgbify = spawn(rasterioPath, [
+            'rgbify', '-b','-10000','-i','0.1', '--max-z', maxZ, '--min-z', minZ,
+            '--format', 'webp', '--bounding-tile', `[${x.toString()},${y.toString()},${z.toString()}]`, 
+            mergedPath, tmpPath
+        ])
+        //rgbify.stdout.on('data', (data) => {
+        //    console.log(`stdout: ${data}`)
+        //})
+        rgbify.stderr.on('data', (data) =>{
+            console.log(`stderr(at rgbify):${data}`)
+        })
+        rgbify.on('error', (error) => console.log(error.message.message))
+        rgbify.on('exit', (code, signal) =>{
+            if(code) console.log(`process exit with code: ${code}.`)
+            if(signal) console.log(`process killed with signal: ${signal}.`)
+            keyInProgress = keyInProgress.filter((v) => !(v === key)) 
+            fs.renameSync(tmpPath,dstPath)
+            //fs.unlinkSync(mergedPath)
+            const rgbEndTime = new Date() 
+            console.log(`--- ${key} ends:  (${rgbStartTime.toISOString()} --> ${rgbEndTime.toISOString()} )`)
+            return cb()
+        })
+    }
 },{
     concurrent: config.get('concurrent'),
     maxRetries: config.get('maxRetries'),
